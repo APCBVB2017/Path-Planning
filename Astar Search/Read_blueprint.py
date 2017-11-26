@@ -1,48 +1,75 @@
 import cv2
 import numpy as np
 import heapq
-
 import matplotlib.pyplot as plt
 
-rows = 10
-columns = 10
+
+
+rows = 60
+columns = 60
 width, height = 100, 100
 def grid_map(img):
     # create a 2d array
-    cv2.imwrite("image.jpg",img)
-    # cv2.waitKey(0)
+
 
     grid = np.zeros((rows, columns))
+    print grid
     print
-    for i in range(rows):
-        for j in range(columns):
-            # white blocks
-            if (np.array_equal(img[18+(i*37), 18+(j*37)], [255, 255, 255])):
-                grid[i][j] = 0
-            # start -> orange block
-            elif (np.array_equal(img[18+(i*37), 18+(j*37)], [39, 127, 255])):
-                grid[i][j] = 2
-            # end -> pink block
-            elif (np.array_equal(img[18+(i*37), 18+(j*37)], [201, 174, 255])):
-                grid[i][j] = 3
-            # obstacles ->black blocks
-            else:
-                grid[i][j] = 1
+    try:
+
+
+        for i in range(rows):
+            for j in range(columns):
+                # white blocks
+                if (np.array_equal(img[18+(i*37), 18+(j*37)], [255, 255, 255])):
+                    grid[i][j] = 0
+                    # start -> orange block
+                elif (np.array_equal(img[18+(i*37), 18+(j*37)], [39, 127, 255])):
+                    grid[i][j] = 2
+                    # end -> pink block
+                elif (np.array_equal(img[18+(i*37), 18+(j*37)], [201, 174, 255])):
+                    grid[i][j] = 3
+                # obstacles ->black blocks
+                else:
+                    grid[i][j] = 1
+
+
+
+
+
+    except Exception as e:
+        print 'An Exception has occured,the Rows and Columns do not seem to match'
+        print
+        print 'please enter the number of rows and columns manually'
+        row_local = input('Rows : ')
+        Column_local = input('Columns : ')
+
+        for i in range(int(row_local)):
+            for j in range(int(Column_local)):
+                # white blocks
+                if (np.array_equal(img[18+(i*37), 18+(j*37)], [255, 255, 255])):
+                    grid[i][j] = 0
+                    # start -> orange block
+                elif (np.array_equal(img[18+(i*37), 18+(j*37)], [39, 127, 255])):
+                    grid[i][j] = 2
+                    # end -> pink block
+                elif (np.array_equal(img[18+(i*37), 18+(j*37)], [201, 174, 255])):
+                    grid[i][j] = 3
+                # obstacles ->black blocks
+                else:
+                    grid[i][j] = 1
+
     print grid
 
-
-
-
-
+    # plt.imshow(grid, interpolation='none') # Plot the image, turn off interpolation
+    # plt.show() # Show the image window
     return grid
-
     cv2.destroyAllWindows()
 
 # -------------Route Plotting algorithm---------------
 
 def plotter(grid,route):
     p = grid
-    print
     print 'plotting'
     print route
     for x,y in route:
@@ -50,8 +77,11 @@ def plotter(grid,route):
 
     print p
     plt.imshow(p, interpolation='none') # Plot the image, turn off interpolation
-    plt.show(1) # Show the image window
+    # plt.show(1) # Show the image window
+    plt.savefig('Route_'+number+'.png')
 # -----------------------------------------------------
+# -----------------------------------------------------
+
 # ---------------------------A-Star Search Algorithm---------------
 
 class Cell(object):
@@ -173,16 +203,16 @@ def play(img):
     return route_length, route_path
 
 
-# -----------------------------------------------------------------
+# ---------------------------A-Star Search Algorithm---------------
 
 
 
 # -------------------------------Main------------------------
-
-gray = cv2.imread('Images/2.png')
+number = raw_input('Enter blueprint number ')
+print 'Blueprint selected ' + number
+print
+gray = cv2.imread('blueprints/clite_sen_'+number+'.png')
 edges = cv2.Canny(gray,50,150,apertureSize = 3)
-cv2.imwrite('edges-50-150.jpg',edges)
-# cv2.waitKey(0)
 minLineLength=100
 
 lines = cv2.HoughLinesP(image=edges,rho=1,theta=np.pi/180, threshold=100,lines=np.array([]), minLineLength=minLineLength,maxLineGap=80)
@@ -191,18 +221,14 @@ lines = cv2.HoughLinesP(image=edges,rho=1,theta=np.pi/180, threshold=100,lines=n
 a,b,c = lines.shape
 for i in range(a):
     cv2.line(gray, (lines[i][0][0], lines[i][0][1]), (lines[i][0][2], lines[i][0][3]), (0, 0, 255), 1, 4)
-    cv2.imwrite('houghlines5.jpg',gray)
 
 grid_map(gray)
 
-
 route_length, route_path = play(gray)
-
-
-
-print "OUTPUT FOR SINGLE IMAGE (IMAGE 1)..."
+print "Route displayed"
 print "route length = ", route_length
 print "route path   = ", route_path
+np.save('Route_path_'+number+'.npy', route_path)
 
 plotter(grid_map(gray),route_path)
 # -------------------------------Main------------------------

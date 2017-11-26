@@ -2,57 +2,32 @@ import cv2
 import numpy as np
 import heapq
 
-import matplotlib.pyplot as plt
-
+# no of rows and columns in grid
 rows = 10
 columns = 10
-width, height = 100, 100
+
+
 def grid_map(img):
     # create a 2d array
-    cv2.imwrite("image.jpg",img)
-    # cv2.waitKey(0)
-
     grid = np.zeros((rows, columns))
-    print
+    print grid
     for i in range(rows):
         for j in range(columns):
             # white blocks
-            if (np.array_equal(img[18+(i*37), 18+(j*37)], [255, 255, 255])):
+            if (np.array_equal(img[20+(i*40), 20+(j*40)], [255, 255, 255])):
                 grid[i][j] = 0
             # start -> orange block
-            elif (np.array_equal(img[18+(i*37), 18+(j*37)], [39, 127, 255])):
+            elif (np.array_equal(img[20+(i*40), 20+(j*40)], [39, 127, 255])):
                 grid[i][j] = 2
             # end -> pink block
-            elif (np.array_equal(img[18+(i*37), 18+(j*37)], [201, 174, 255])):
+            elif (np.array_equal(img[20+(i*40), 20+(j*40)], [201, 174, 255])):
                 grid[i][j] = 3
             # obstacles ->black blocks
             else:
                 grid[i][j] = 1
     print grid
-
-
-
-
-
     return grid
 
-    cv2.destroyAllWindows()
-
-# -------------Route Plotting algorithm---------------
-
-def plotter(grid,route):
-    p = grid
-    print
-    print 'plotting'
-    print route
-    for x,y in route:
-        p[(y-1),(x-1)] = 5
-
-    print p
-    plt.imshow(p, interpolation='none') # Plot the image, turn off interpolation
-    plt.show(1) # Show the image window
-# -----------------------------------------------------
-# ---------------------------A-Star Search Algorithm---------------
 
 class Cell(object):
     def __init__(self, x, y, reachable):
@@ -173,36 +148,23 @@ def play(img):
     return route_length, route_path
 
 
-# -----------------------------------------------------------------
-
-
-
-# -------------------------------Main------------------------
-
-gray = cv2.imread('Images/2.png')
-edges = cv2.Canny(gray,50,150,apertureSize = 3)
-cv2.imwrite('edges-50-150.jpg',edges)
-# cv2.waitKey(0)
-minLineLength=100
-
-lines = cv2.HoughLinesP(image=edges,rho=1,theta=np.pi/180, threshold=100,lines=np.array([]), minLineLength=minLineLength,maxLineGap=80)
-
-
-a,b,c = lines.shape
-for i in range(a):
-    cv2.line(gray, (lines[i][0][0], lines[i][0][1]), (lines[i][0][2], lines[i][0][3]), (0, 0, 255), 1, 4)
-    cv2.imwrite('houghlines5.jpg',gray)
-
-grid_map(gray)
-
-
-route_length, route_path = play(gray)
-
-
-
-print "OUTPUT FOR SINGLE IMAGE (IMAGE 1)..."
-print "route length = ", route_length
-print "route path   = ", route_path
-
-plotter(grid_map(gray),route_path)
-# -------------------------------Main------------------------
+if __name__ == "__main__":
+    # code for checking output for single image
+    img = cv2.imread('SampleImages/test_image1.png')
+    route_length, route_path = play(img)
+    print "OUTPUT FOR SINGLE IMAGE (IMAGE 1)..."
+    print "route length = ", route_length
+    print "route path   = ", route_path
+    # code for checking output for all images
+    route_length_list = []
+    route_path_list = []
+    # for file_number in range(1, 6):
+    #     file_name = "SampleImages/test_image"+str(file_number)+".png"
+    #     pic = cv2.imread(file_name)
+    #     route_length, route_path = play(pic)
+    #     route_length_list.append(route_length)
+    #     route_path_list.append(route_path)
+    # # print "OUTPUT FOR ALL IMAGES..."
+    # # for i in range(5):
+    # #     print "route length for image ", i+1, " = ", route_length_list[i]
+    # #     print "route path for image ", i+1, " = ", route_path_list[i]
