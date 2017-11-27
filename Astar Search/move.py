@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import rospy
 count = 0
 count2 = 0
 
@@ -29,3 +30,16 @@ for x,y in r:
 
 
 # print 'move ' + str(count) + ' steps and turn'
+
+
+
+
+
+# -------------------------------Ros Control
+rospy.init_node('control', anonymous=False)
+
+pub_wheel_l = rospy.Publisher('/path_planner/left_wheel_controller/command', Float64 , queue_size=1,latch=True )
+pub_wheel_r = rospy.Publisher('/path_planner/right_wheel_controller/command', Float64 , queue_size=1,latch=True)
+
+pub_wheel_l.publish(Float64(10))
+pub_wheel_r.publish(Float64(10))
